@@ -12,10 +12,12 @@
 
 ## Tasks
 
+> Read through all the tasks and notes before solving.
+
 ### F | 12%pp
 
-- [ ] Fork this Gist -> Now you can use this Checklist
-- [ ] Clone your version of gist -> Now you can push your changes
+- [ ] Fork this repo
+- [ ] Clone -> Now you can push your changes
 - [ ] Install [buf](https://docs.buf.build/introduction) and generate code from [proto](pkg/proto/challenge.proto)
 - [ ] Make gRPC Server base: `main.go` in `cmd/server`, server methods in `pkg/server`
 - [ ] Comments and docs are appreciated :)
@@ -28,9 +30,9 @@
 
 ### C | 3%pp
 
+- [ ] Make link metadata test(s): [task description](#metadata-bonus)
 - [ ] Make Timer Streaming method: [task description](#online-timer-and-streaming)
 - [ ] Make it running in Docker: [task description](#docker)
-- [ ] Make link metadata test(s): [task description](#metadata-bonus)
 
 ### B | 5%pp
 
