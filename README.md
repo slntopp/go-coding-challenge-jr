@@ -70,6 +70,8 @@ Using [Bitly API](https://dev.bitly.com), implement `ChallengeService.MakeShortL
 
 API calls has to be implemented with `net/http`.
 
+> You need to register at bit.ly to get token and username
+
 ### Short-links Bonus
 
 Implement server method test using `*testing.T` and `net/http`. Test should generate link using server method and ensure short-link actually leads to given link(see http statuses and follow-redirects).
@@ -119,3 +121,5 @@ Workflow must:
 2. Start Docker Container
 3. Run tests with this container
 4. Publish Docker Image to `ghcr.io`(Github Packages of your repo)
+
+> You should store bit.ly credentials in Repo secrets
