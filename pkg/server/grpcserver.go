@@ -27,13 +27,14 @@ func (s *GRPCServer) MakeShortLink(ctx context.Context, link *api.Link) (*api.Li
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer {%s}", config.BitlyOauthToken))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", config.BitlyOauthToken))
 
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
+	fmt.Println(resp)
 	bodyText, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
