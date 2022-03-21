@@ -34,7 +34,6 @@ func (s *GRPCServer) MakeShortLink(ctx context.Context, link *api.Link) (*api.Li
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
-	fmt.Println(resp)
 	bodyText, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
