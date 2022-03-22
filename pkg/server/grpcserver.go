@@ -41,7 +41,19 @@ func (s *GRPCServer) MakeShortLink(ctx context.Context, link *api.Link) (*api.Li
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &api.Link{Data: string(bodyText)}, nil
+
+	var jsonBody map[string]interface{}
+	err = json.Unmarshal(bodyText, &jsonBody)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if shortLink, linkExist := jsonBody["link"].(string); linkExist {
+		return &api.Link{Data: shortLink}, nil
+	} else {
+		err = fmt.Errorf("%v", jsonBody["message"])
+		return nil, err
+	}
 }
 
 func (s *GRPCServer) ReadMetadata(ctx context.Context, placeholder *api.Placeholder) (*api.Placeholder, error) {
@@ -94,10 +106,10 @@ func (s *GRPCServer) StartTimer(timer *api.Timer, server api.ChallengeService_St
 		if secondsRemaining == 0 {
 			break
 		}
-		frequencyTimer := time.NewTimer(time.Second * time.Duration(timer.GetFrequency()))
-		<-frequencyTimer.C
 		timer.Seconds = int64(secondsRemaining)
 		server.Send(timer)
+		frequencyTimer := time.NewTimer(time.Second * time.Duration(timer.GetFrequency()))
+		<-frequencyTimer.C
 	}
 
 	return nil
