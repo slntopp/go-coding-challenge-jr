@@ -4,11 +4,14 @@ import (
 	"challenge/pkg/api"
 	"challenge/util"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type GRPCServer struct{}
@@ -45,6 +48,57 @@ func (s *GRPCServer) ReadMetadata(ctx context.Context, placeholder *api.Placehol
 	return &api.Placeholder{Data: fmt.Sprintf("%v", ctx.Value("i-am-random-key"))}, nil
 }
 
-func (s *GRPCServer) StartTimer(imer *api.Timer, server api.ChallengeService_StartTimerServer) error {
+func (s *GRPCServer) StartTimer(timer *api.Timer, server api.ChallengeService_StartTimerServer) error {
+	client := &http.Client{}
+
+	CheckTime := func(timerName string) int {
+		req, err := http.NewRequest("GET", "https://timercheck.io"+"/"+timerName, nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer resp.Body.Close()
+
+		bodyText, err := ioutil.ReadAll(resp.Body)
+		var jsonBody map[string]interface{}
+		err = json.Unmarshal(bodyText, &jsonBody)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if secondsRemaining, timerExist := jsonBody["seconds_remaining"].(float64); timerExist {
+			return int(secondsRemaining)
+		} else {
+			return 0
+		}
+	}
+
+	if CheckTime(timer.GetName()) == 0 {
+		req, err := http.NewRequest("GET", "https://timercheck.io"+"/"+timer.GetName()+"/"+strconv.Itoa(int(timer.GetSeconds())), nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		_, err = client.Do(req)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	for {
+		secondsRemaining := CheckTime(timer.GetName())
+		if secondsRemaining == 0 {
+			break
+		}
+		frequencyTimer := time.NewTimer(time.Second * time.Duration(timer.GetFrequency()))
+		<-frequencyTimer.C
+		timer.Seconds = int64(secondsRemaining)
+		server.Send(timer)
+	}
+
 	return nil
 }
