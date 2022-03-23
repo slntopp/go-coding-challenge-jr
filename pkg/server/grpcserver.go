@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"google.golang.org/grpc/metadata"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -57,7 +58,8 @@ func (s *GRPCServer) MakeShortLink(ctx context.Context, link *api.Link) (*api.Li
 }
 
 func (s *GRPCServer) ReadMetadata(ctx context.Context, placeholder *api.Placeholder) (*api.Placeholder, error) {
-	return &api.Placeholder{Data: fmt.Sprintf("%v", ctx.Value("i-am-random-key"))}, nil
+	md, _ := metadata.FromOutgoingContext(ctx)
+	return &api.Placeholder{Data: fmt.Sprintf("%v", md["i-am-random-key"])}, nil
 }
 
 func (s *GRPCServer) StartTimer(timer *api.Timer, server api.ChallengeService_StartTimerServer) error {

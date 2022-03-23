@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 	"log"
 )
 
@@ -49,7 +50,7 @@ to quickly create a Cobra application.`,
 		}
 
 		c := api.NewChallengeServiceClient(conn)
-		resp, err := c.ReadMetadata(context.Background(), &api.Placeholder{Data: data})
+		resp, err := c.ReadMetadata(metadata.NewOutgoingContext(context.Background(), metadata.Pairs("i-am-random-key", "i-am-random-key-value")), &api.Placeholder{Data: data})
 		if err != nil {
 			log.Fatal(err)
 		}
